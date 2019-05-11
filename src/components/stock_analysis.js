@@ -55,6 +55,7 @@ class StockAnalysis extends React.Component {
 
     return (
       <S.Grid>
+        <h2>CAGR</h2>
         <div>
           {"Duration: " + this.state.duration}
           <SliderWithTooltip
@@ -74,7 +75,7 @@ class StockAnalysis extends React.Component {
             <Input parent={this} state_key={"final_value"} />
           </div>
           <div>
-            {"Returns per annum: "}
+            {"Returns per annum (CAGR): "}
             <Input parent={this} state_key={"returns"} />
             {" %"}
           </div>
