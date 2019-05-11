@@ -4,6 +4,9 @@ import Slider, { createSliderWithTooltip } from "rc-slider";
 import AutosizeInput from "react-input-autosize";
 import styled from "styled-components";
 import Input from "./input";
+import clone from "../lib/clone";
+import Finance from "financejs";
+var finance = new Finance();
 
 const SliderWithTooltip = createSliderWithTooltip(Slider);
 
@@ -11,6 +14,7 @@ let S = {};
 
 S.Grid = styled.div`
   display: grid;
+  grid-row-gap: 4px;
 `;
 
 class StockAnalysis extends React.Component {
@@ -20,33 +24,60 @@ class StockAnalysis extends React.Component {
     this.state = {
       duration: 10,
       initial_value: 10,
-      final_value: 100
+      final_value: 100,
+      returns: 10
     };
+
+    this.last_state = {};
+  }
+
+  sync_values() {
+    if (this.last_state.final_value === this.state.final_value) {
+      var new_final_value = this.state.initial_value;
+      for (var i = 0; i < this.state.duration; i++) {
+        new_final_value = new_final_value * (1 + this.state.returns / 100);
+      }
+      this.state.final_value = new_final_value;
+    } else if (this.last_state.returns === this.state.returns) {
+      var new_returns = finance.CAGR(
+        this.state.initial_value,
+        this.state.final_value,
+        this.state.duration
+      );
+      this.state.returns = new_returns;
+    }
+
+    this.last_state = clone(this.state);
   }
 
   render() {
+    this.sync_values();
+
     return (
       <S.Grid>
-        <SliderWithTooltip
-          value={this.state.duration}
-          onChange={function(value) {
-            this.setState({ duration: value });
-            console.log(this.state);
-          }.bind(this)}
-        />
-        <S.Grid>
-          {"Initial value: "}
-          <AutosizeInput
-            type="number"
-            defaultValue={this.state.initial_value}
-            onChange={function(e) {
-              this.setState({
-                initial_value: e.target.value
-              });
-              console.log(this.state);
+        <div>
+          {"Duration: " + this.state.duration}
+          <SliderWithTooltip
+            value={this.state.duration}
+            onChange={function(value) {
+              this.setState({ duration: value });
             }.bind(this)}
           />
-          <Input parent={this} state_key={"duration"} />
+        </div>
+        <S.Grid>
+          <div>
+            {"Initial value: "}
+            <Input parent={this} state_key={"initial_value"} />
+          </div>
+          <div>
+            {"Final value: "}
+            <Input parent={this} state_key={"final_value"} />
+          </div>
+          <div>
+            {"Returns per annum: "}
+            <Input parent={this} state_key={"returns"} />
+            {" %"}
+          </div>
         </S.Grid>
       </S.Grid>
     );

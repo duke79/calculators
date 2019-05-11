@@ -6,6 +6,8 @@
   "main": "src/index.js",
   "dependencies": {
     "chart.js": "2.8.0",
+    "financejs": "4.1.0",
+    "jQuery": "1.7.4",
     "rc-slider": "8.6.9",
     "react": "16.8.6",
     "react-chartjs": "1.2.0",
